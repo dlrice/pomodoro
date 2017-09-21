@@ -12,7 +12,7 @@ def notify():
     subprocess.call(['afplay', AUDIO_FILE])
 
 def main():
-    for i in tqdm(range(DURATION), leave=True, bar_format='{bar} {n} | {total} minutes'):
+    for i in tqdm(range(DURATION), leave=True, bar_format='{bar} {n} | {total} minutes', ncols=DURATION*2):
         sleep(60)
     notify()
 
