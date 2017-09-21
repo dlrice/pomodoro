@@ -13,7 +13,7 @@ def notify():
 
 def main():
     for i in tqdm(range(DURATION), leave=True, bar_format='{bar} {total} minutes'):
-        sleep(0.060)
+        sleep(60)
     notify()
 
 if __name__ == '__main__':
