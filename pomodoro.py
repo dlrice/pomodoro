@@ -12,11 +12,12 @@ AUDIO_FILE = 'solemn.mp3'
 class Pomodoro(object):
 
     def __init__(self, duration):
-        self._duration = duration
         signal.signal(signal.SIGINT, self.signal_handler)
+        self.start(duration)
 
     def signal_handler(self, signal, frame):
-        print('\nCancelled after {} minutes'.format(self._progress/60))
+        t = self._progress/60
+        print('\nCancelled after {} minutes'.format(t))
         sys.exit(0)
 
 
@@ -24,9 +25,7 @@ class Pomodoro(object):
         os.system("osascript -e 'display notification \"Pomodoro session complete!\" with title \"Done!\"'")
         subprocess.call(['afplay', AUDIO_FILE])
 
-    def start(self):
-        duration = self._duration
-
+    def start(self, duration):
         s = '{} min '.format(duration)
         args = {
             'leave': True,
@@ -45,7 +44,6 @@ def main():
     args = sys.argv
     duration = int(args[1]) if len(args) > 1 else 25
     p = Pomodoro(duration)
-    p.start()
 
 
 if __name__ == '__main__':
