@@ -12,12 +12,13 @@ AUDIO_FILE = 'solemn.mp3'
 class Pomodoro(object):
 
     def __init__(self, duration):
+        self._progress = 0
         signal.signal(signal.SIGINT, self.signal_handler)
         self.start(duration)
 
     def signal_handler(self, signal, frame):
         t = self._progress/60
-        print('\nCancelled after {} minutes'.format(t))
+        print('\nCancelled after {} minutes'.format(t), end='')
         sys.exit(0)
 
 
@@ -43,7 +44,7 @@ class Pomodoro(object):
 def main():
     args = sys.argv
     duration = int(args[1]) if len(args) > 1 else 25
-    p = Pomodoro(duration)
+    Pomodoro(duration)
 
 
 if __name__ == '__main__':
