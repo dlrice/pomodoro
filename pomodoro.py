@@ -3,16 +3,24 @@ import os
 import subprocess
 from tqdm import tqdm
 from time import sleep
+from math import log10
 import sys
 import signal
+from colorama import init
+from colorama import Fore
+init()
 
-AUDIO_FILE = 'solemn.mp3'
+POMODORO_FILE = 'solemn.mp3'
+RELAX_FILE = 'to-the-point.mp3'
 
 
-class Pomodoro(object):
-
-    def __init__(self, duration):
+class Timer(object):
+    def __init__(self, duration, start_message, color, notify_message, sound_file):
+        self._notify_message = notify_message
+        self._sound_file = sound_file
+        self._start_message = start_message
         self._progress = 0
+        self._color = color
         signal.signal(signal.SIGINT, self.signal_handler)
         self.start(duration)
 
@@ -21,17 +29,18 @@ class Pomodoro(object):
         print('\nCancelled after {} minutes'.format(t), end='')
         sys.exit(0)
 
-
     def notify(self):
-        os.system("osascript -e 'display notification \"Pomodoro session complete!\" with title \"Done!\"'")
-        subprocess.call(['afplay', AUDIO_FILE])
+        os.system(
+            f"osascript -e 'display notification \
+            \"{self._notify_message}\" with title \"Done!\"'")
+        subprocess.call(['afplay', self._sound_file])
 
     def start(self, duration):
-        s = '{} min '.format(duration)
+        t = '{} min '.format(duration)
         args = {
             'leave': True,
-            'bar_format': '|{bar}| ' + s,
-            'ncols': max(duration*2, 50)
+            'bar_format': self._color + self._start_message + ' |{bar}| ' + t,
+            'ncols': 50 + int(log10(duration))
         }
         niterations = 25
         sleep_duration = 60 * duration / niterations
@@ -44,7 +53,16 @@ class Pomodoro(object):
 def main():
     args = sys.argv
     duration = int(args[1]) if len(args) > 1 else 25
-    Pomodoro(duration)
+    Timer(duration=1,
+          start_message='Rest    ',
+          color=Fore.BLUE,
+          notify_message='Rest complete',
+          sound_file=RELAX_FILE)
+    Timer(duration=duration,
+          start_message='Pomodoro',
+          color=Fore.GREEN,
+          notify_message='Pomodoro complete',
+          sound_file=POMODORO_FILE)
 
 
 if __name__ == '__main__':
