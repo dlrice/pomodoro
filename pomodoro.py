@@ -9,10 +9,10 @@ import signal
 import datetime
 from colorama import init
 from colorama import Fore
+
 init()
 
-POMODORO_FILE = 'solemn.mp3'
-RELAX_FILE = 'to-the-point.mp3'
+DONE_SOUND_FILE = "airplane-ding-sound.mp3"
 
 sys.tracebacklimit = 0
 
@@ -31,21 +31,21 @@ class Timer(object):
         m, s = divmod(self._progress, 60)
         m = trunc(m)
         s = trunc(s)
-        print(Fore.CYAN +
-              f'\nCancelled after {m:d} minutes and {s:d} seconds', end='')
+        print(Fore.CYAN + f"\nCancelled after {m:d} minutes and {s:d} seconds", end="")
         sys.exit(0)
 
     def notify(self):
         os.system(
-            f"osascript -e 'display notification \"{self._notify_message}\" with title \"Done!\"'")
-        subprocess.call(['afplay', self._sound_file])
+            f'osascript -e \'display notification "{self._notify_message}" with title "Done!"\''
+        )
+        subprocess.call(["afplay", self._sound_file])
 
     def start(self, duration):
-        t = f'{duration} min '
+        t = f"{duration} min "
         args = {
-            'leave': True,
-            'bar_format': self._color + self._start_message + ' |{bar}| ' + t,
-            'ncols': 50 + int(log10(duration))
+            "leave": True,
+            "bar_format": self._color + self._start_message + " |{bar}| " + t,
+            "ncols": 50 + int(log10(duration)),
         }
         niterations = 25
         sleep_duration = 60 * duration / niterations
@@ -56,11 +56,13 @@ class Timer(object):
 
 
 def stage(n, duration, color):
-    Timer(duration=duration,
-          start_message=f'Stage {n}',
-          color=color,
-          notify_message='Complete',
-          sound_file=POMODORO_FILE)
+    Timer(
+        duration=duration,
+        start_message=f"Stage {n}",
+        color=color,
+        notify_message="Complete",
+        sound_file=DONE_SOUND_FILE,
+    )
 
 
 def main():
@@ -68,12 +70,12 @@ def main():
     durations = [int(arg) for arg in args]
 
     now = datetime.datetime.now().strftime("%H:%M %B %d, %Y")
-    print(Fore.CYAN + f'Started at {now}')
+    print(Fore.CYAN + f"Started at {now}")
 
-    colors = [Fore.LIGHTMAGENTA_EX, Fore.CYAN, Fore.GREEN,  Fore.RED]
+    colors = [Fore.LIGHTMAGENTA_EX, Fore.CYAN, Fore.GREEN, Fore.RED]
     for i, duration in enumerate(durations):
         stage(i + 1, duration, colors[i % len(colors)])
 
 
-if __name__ == '__main__':
+if __name__ == "__main__":
     main()
