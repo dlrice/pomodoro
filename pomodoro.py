@@ -16,6 +16,7 @@ RELAX_FILE = 'to-the-point.mp3'
 
 sys.tracebacklimit = 0
 
+
 class Timer(object):
     def __init__(self, duration, start_message, color, notify_message, sound_file):
         self._notify_message = notify_message
@@ -30,7 +31,8 @@ class Timer(object):
         m, s = divmod(self._progress, 60)
         m = trunc(m)
         s = trunc(s)
-        print(Fore.CYAN + f'\nCancelled after {m:d} minutes and {s:d} seconds', end='')
+        print(Fore.CYAN +
+              f'\nCancelled after {m:d} minutes and {s:d} seconds', end='')
         sys.exit(0)
 
     def notify(self):
@@ -53,23 +55,24 @@ class Timer(object):
         self.notify()
 
 
+def stage(n, duration, color):
+    Timer(duration=duration,
+          start_message=f'Stage {n}',
+          color=color,
+          notify_message='Complete',
+          sound_file=POMODORO_FILE)
+
+
 def main():
-    args = sys.argv
-    duration = int(args[1]) if len(args) > 1 else 25
+    args = sys.argv[1:]
+    durations = [int(arg) for arg in args]
 
     now = datetime.datetime.now().strftime("%H:%M %B %d, %Y")
     print(Fore.CYAN + f'Started at {now}')
 
-    Timer(duration=1,
-          start_message='Prepare ',
-          color=Fore.BLUE,
-          notify_message='Preparation complete',
-          sound_file=RELAX_FILE)
-    Timer(duration=duration,
-          start_message='Pomodoro',
-          color=Fore.GREEN,
-          notify_message='Pomodoro complete',
-          sound_file=POMODORO_FILE)
+    colors = [Fore.LIGHTMAGENTA_EX, Fore.CYAN, Fore.GREEN,  Fore.RED]
+    for i, duration in enumerate(durations):
+        stage(i + 1, duration, colors[i % len(colors)])
 
 
 if __name__ == '__main__':
