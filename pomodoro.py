@@ -1,14 +1,15 @@
 #!/usr/bin/env python
-import os
-import subprocess
-from tqdm import tqdm
-from time import sleep
-from math import log10, trunc
-import sys
-import signal
 import datetime
-from colorama import init
-from colorama import Fore
+import json
+import os
+import signal
+import subprocess
+import sys
+from math import log10, trunc
+from time import sleep
+
+from colorama import Fore, init
+from tqdm import tqdm
 
 init()
 
@@ -65,6 +66,24 @@ def stage(n, duration, color):
     )
 
 
+def get_today():
+    return datetime.datetime.now().strftime("%Y-%m-%d")
+
+
+def update_sessions_json():
+    try:
+        with open("sessions.json", "r", encoding="utf-8") as f:
+            sessions = json.load(f)
+    except FileNotFoundError:
+        sessions = {}
+    today = get_today()
+    today_count = sessions.get(today, 0) + 1
+    sessions[today] = today_count
+    with open("sessions.json", "w", encoding="utf-8") as f:
+        json.dump(sessions, f, indent=4, sort_keys=True)
+    return today_count
+
+
 def main():
     args = sys.argv[1:]
     durations = [int(arg) for arg in args]
@@ -75,6 +94,9 @@ def main():
     colors = [Fore.LIGHTMAGENTA_EX, Fore.CYAN, Fore.GREEN, Fore.RED]
     for i, duration in enumerate(durations):
         stage(i + 1, duration, colors[i % len(colors)])
+
+    today_count = update_sessions_json()
+    print(Fore.GREEN + f"Sessions today: {today_count}")
 
 
 if __name__ == "__main__":
